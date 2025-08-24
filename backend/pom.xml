@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.5</version>
         <relativePath/>
     </parent>
 
@@ -20,10 +20,11 @@
 
     <properties>
         <java.version>17</java.version>
-        <james-server.version>3.8.0</james-server.version>
-        <mysql.version>8.0.33</mysql.version>
-        <jwt.version>0.12.3</jwt.version>
+        <greenmail.version>2.1.0</greenmail.version>
+        <mysql.version>8.4.0</mysql.version>
+        <jwt.version>0.12.5</jwt.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <lombok.version>1.18.30</lombok.version>
     </properties>
 
     <dependencies>
@@ -63,53 +64,29 @@
 
         <!-- MySQL Database -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <version>${mysql.version}</version>
         </dependency>
 
         <!-- Mail Server Components -->
         <dependency>
             <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>1.6.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>smtp</artifactId>
+            <artifactId>jakarta.mail</artifactId>
             <version>2.0.1</version>
         </dependency>
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>imap</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.subethamail</groupId>
-            <artifactId>subethasmtp</artifactId>
-            <version>3.1.7</version>
-        </dependency>
+        <!-- Removed SubEthaSMTP - obsolete since 2014, using GreenMail instead -->
         
-        <!-- Apache James Components for Mail Server -->
+        <!-- GreenMail for Mail Server Testing/Implementation -->
         <dependency>
-            <groupId>org.apache.james</groupId>
-            <artifactId>james-server-core</artifactId>
-            <version>${james-server.version}</version>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+            <version>${greenmail.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.james</groupId>
-            <artifactId>james-server-protocols-smtp</artifactId>
-            <version>${james-server.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.james</groupId>
-            <artifactId>james-server-protocols-imap4</artifactId>
-            <version>${james-server.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.james</groupId>
-            <artifactId>james-server-protocols-pop3</artifactId>
-            <version>${james-server.version}</version>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail-spring</artifactId>
+            <version>${greenmail.version}</version>
         </dependency>
 
         <!-- JWT for Authentication -->
@@ -136,10 +113,8 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-        </dependency>
+        <!-- Lettuce is included by default with spring-boot-starter-data-redis -->
+        <!-- Removed Jedis to avoid conflict -->
 
         <!-- Apache Commons -->
         <dependency>
@@ -151,18 +126,9 @@
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-email</artifactId>
-            <version>1.5</version>
-        </dependency>
+        <!-- Removed deprecated commons-email, using Spring Boot Mail instead -->
 
-        <!-- MapStruct for DTO Mapping -->
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
-        </dependency>
+        <!-- MapStruct for DTO Mapping (Optional - removed if not used) -->
 
         <!-- Lombok -->
         <dependency>
@@ -185,11 +151,11 @@
             <version>2.0.1</version>
         </dependency>
         
-        <!-- Anti-Spam -->
+        <!-- Simple Java Mail for advanced email features -->
         <dependency>
-            <groupId>org.apache.spamassassin</groupId>
-            <artifactId>spamassassin-client</artifactId>
-            <version>1.0.0</version>
+            <groupId>org.simplejavamail</groupId>
+            <artifactId>simple-java-mail</artifactId>
+            <version>8.3.1</version>
         </dependency>
 
         <!-- Testing -->

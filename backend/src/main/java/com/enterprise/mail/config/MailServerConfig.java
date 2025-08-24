@@ -27,9 +27,14 @@ public class MailServerConfig {
         private boolean enabled = true;
         private int port = 25;
         private int securePort = 465;
+        private int sslPort = 465;  // alias for securePort
         private int maxConnections = 100;
         private boolean authRequired = true;
         private boolean tlsEnabled = true;
+        
+        public int getSslPort() {
+            return securePort;
+        }
     }
     
     @Data
@@ -37,7 +42,12 @@ public class MailServerConfig {
         private boolean enabled = true;
         private int port = 143;
         private int securePort = 993;
+        private int sslPort = 993;  // alias for securePort
         private int maxConnections = 50;
+        
+        public int getSslPort() {
+            return securePort;
+        }
     }
     
     @Data
@@ -45,7 +55,12 @@ public class MailServerConfig {
         private boolean enabled = true;
         private int port = 110;
         private int securePort = 995;
+        private int sslPort = 995;  // alias for securePort
         private int maxConnections = 30;
+        
+        public int getSslPort() {
+            return securePort;
+        }
     }
     
     @Data
@@ -72,9 +87,16 @@ public class MailServerConfig {
     
     @Data
     public static class MailConfig {
-        private String host = "localhost";
-        private int port = 25;
-        private String username = "admin@enterprise.mail";
-        private String password = "admin123456";
+        @Value("${mail.host:localhost}")
+        private String host;
+        
+        @Value("${mail.port:25}")
+        private int port;
+        
+        @Value("${mail.username:}")
+        private String username;
+        
+        @Value("${mail.password:}")
+        private String password;
     }
 }

@@ -108,14 +108,46 @@ const sendEmail = async () => {
   const valid = await emailFormRef.value?.validate()
   if (!valid) return
   
-  // TODO: 调用发送邮件API
-  ElMessage.success('邮件已发送')
-  resetForm()
+  // 调用发送邮件API
+  try {
+    const response = await fetch('/api/emails/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(emailForm.value)
+    })
+    if (response.ok) {
+      ElMessage.success('邮件已发送')
+      resetForm()
+    } else {
+      ElMessage.error('邮件发送失败')
+    }
+  } catch (error) {
+    ElMessage.error('邮件发送失败')
+  }
 }
 
-const saveDraft = () => {
-  // TODO: 调用保存草稿API
-  ElMessage.success('已保存到草稿箱')
+const saveDraft = async () => {
+  // 调用保存草稿API
+  try {
+    const response = await fetch('/api/emails/drafts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(emailForm.value)
+    })
+    if (response.ok) {
+      ElMessage.success('已保存到草稿箱')
+    } else {
+      ElMessage.error('草稿保存失败')
+    }
+  } catch (error) {
+    ElMessage.error('草稿保存失败')
+  }
 }
 
 const resetForm = () => {

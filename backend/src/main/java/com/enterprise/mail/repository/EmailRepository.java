@@ -32,18 +32,21 @@ public interface EmailRepository extends JpaRepository<Email, Long> {
     @Query("SELECT e FROM Email e WHERE e.user.id = :userId AND e.isImportant = true")
     Page<Email> findImportantEmails(@Param("userId") Long userId, Pageable pageable);
     
-    @Query("SELECT e FROM Email e WHERE e.user.id = :userId AND (e.subject LIKE %:searchTerm% OR e.contentText LIKE %:searchTerm% OR e.fromAddress LIKE %:searchTerm%)")
+    @Query("SELECT e FROM Email e WHERE e.user.id = :userId AND (LOWER(e.subject) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(e.contentText) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(e.fromAddress) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
     Page<Email> searchEmails(@Param("userId") Long userId, @Param("searchTerm") String searchTerm, Pageable pageable);
     
     @Query("SELECT e FROM Email e WHERE e.user.id = :userId AND e.sentDate BETWEEN :startDate AND :endDate")
     List<Email> findEmailsByDateRange(@Param("userId") Long userId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
     
-    @Query("SELECT COUNT(e) FROM Email e WHERE e.user.id = :userId AND e.status = 'UNREAD'")
+    @Query("SELECT COUNT(e) FROM Email e WHERE e.user.id = :userId AND e.status = com.enterprise.mail.entity.Email$EmailStatus.UNREAD")
     Long countUnreadEmails(@Param("userId") Long userId);
     
-    @Query("SELECT COUNT(e) FROM Email e WHERE e.folder.id = :folderId AND e.status = 'UNREAD'")
+    @Query("SELECT COUNT(e) FROM Email e WHERE e.folder.id = :folderId AND e.status = com.enterprise.mail.entity.Email$EmailStatus.UNREAD")
     Long countUnreadEmailsInFolder(@Param("folderId") Long folderId);
     
-    @Query("SELECT SUM(e.sizeBytes) FROM Email e WHERE e.user.id = :userId")
+    @Query("SELECT COUNT(e) FROM Email e WHERE e.folder.id = :folderId")
+    Long countByFolderId(@Param("folderId") Long folderId);
+    
+    @Query("SELECT COALESCE(SUM(e.sizeBytes), 0) FROM Email e WHERE e.user.id = :userId")
     Long calculateTotalStorageUsed(@Param("userId") Long userId);
 }

@@ -85,9 +85,27 @@ const createAlias = async () => {
   const valid = await aliasFormRef.value?.validate()
   if (!valid) return
   
-  // TODO: 调用创建别名API
-  ElMessage.success('别名创建成功')
-  showCreateDialog.value = false
+  // 调用创建别名API
+  try {
+    const response = await fetch('/api/aliases', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(newAlias.value)
+    })
+    if (response.ok) {
+      ElMessage.success('别名创建成功')
+      showCreateDialog.value = false
+      // 重新加载列表
+      aliases.value.push({ ...newAlias.value, id: Date.now() })
+    } else {
+      ElMessage.error('创建别名失败')
+    }
+  } catch (error) {
+    ElMessage.error('创建别名失败')
+  }
 }
 
 const editAlias = (alias: any) => {

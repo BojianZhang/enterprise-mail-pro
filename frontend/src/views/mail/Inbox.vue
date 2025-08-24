@@ -115,7 +115,7 @@
             <p><strong>时间：</strong>{{ formatDateTime(currentEmail.date) }}</p>
           </div>
         </div>
-        <div class="email-content" v-html="currentEmail.content"></div>
+        <div class="email-content" v-html="sanitizedContent"></div>
       </div>
       
       <template #footer>
@@ -131,6 +131,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import DOMPurify from 'dompurify'
 import {
   Refresh,
   Check,
@@ -227,6 +228,15 @@ const toggleStar = () => {
   })
   ElMessage.success('已更新星标状态')
 }
+
+// 计算属性：sanitized content for XSS prevention
+const sanitizedContent = computed(() => {
+  if (!currentEmail.value?.content) return ''
+  return DOMPurify.sanitize(currentEmail.value.content, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'ul', 'ol', 'li', 'a'],
+    ALLOWED_ATTR: ['href', 'target', 'rel']
+  })
+})
 
 const toggleEmailStar = (email: any) => {
   email.starred = !email.starred

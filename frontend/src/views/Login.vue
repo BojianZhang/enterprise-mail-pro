@@ -36,7 +36,7 @@
         <el-form-item>
           <div class="form-options">
             <el-checkbox v-model="rememberMe">记住我</el-checkbox>
-            <el-link type="primary" :underline="false">忘记密码？</el-link>
+            <router-link to="/forgot-password" class="forgot-link">忘记密码？</router-link>
           </div>
         </el-form-item>
         
@@ -142,6 +142,16 @@ const handleLogin = async () => {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      
+      .forgot-link {
+        color: #409eff;
+        text-decoration: none;
+        font-size: 14px;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
     
     .login-footer {

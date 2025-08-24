@@ -1,5 +1,5 @@
 # 使用 Maven 构建 Spring Boot 应用
-FROM maven:3.8.6-openjdk-17 AS builder
+FROM maven:3.9-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
@@ -12,15 +12,12 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # 运行阶段
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
 # 安装必要的工具
-RUN apt-get update && apt-get install -y \
-    netcat \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache curl netcat-openbsd
 
 # 复制构建的 JAR 文件
 COPY --from=builder /app/target/*.jar app.jar

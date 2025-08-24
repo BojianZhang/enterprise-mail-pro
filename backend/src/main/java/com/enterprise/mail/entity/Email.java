@@ -12,7 +12,16 @@ import java.util.Set;
  * Email entity for storing email messages
  */
 @Entity
-@Table(name = "emails")
+@Table(name = "emails",
+    indexes = {
+        @Index(name = "idx_email_user_status", columnList = "user_id, status"),
+        @Index(name = "idx_email_folder", columnList = "folder_id"),
+        @Index(name = "idx_email_sent_date", columnList = "sent_date"),
+        @Index(name = "idx_email_from_address", columnList = "from_address"),
+        @Index(name = "idx_email_subject", columnList = "subject"),
+        @Index(name = "idx_email_message_id", columnList = "message_id")
+    }
+)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Email extends BaseEntity {

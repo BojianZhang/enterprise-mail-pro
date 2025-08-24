@@ -1,0 +1,50 @@
+# 构建 Spring Boot 应用的替代 Dockerfile
+# 使用国内镜像源或者本地构建
+
+# 选项 1: 使用阿里云镜像
+# FROM registry.cn-hangzhou.aliyuncs.com/library/maven:3.9-eclipse-temurin-17 AS builder
+
+# 选项 2: 使用本地 Maven 构建（需要本地安装 Maven）
+FROM eclipse-temurin:17-jdk AS builder
+
+WORKDIR /app
+
+# 安装 Maven (如果使用 JDK 镜像)
+RUN apt-get update && \
+    apt-get install -y maven && \
+    rm -rf /var/lib/apt/lists/*
+
+# 复制 pom.xml 并下载依赖
+COPY pom.xml .
+RUN mvn dependency:go-offline -B || true
+
+# 复制源代码并构建
+COPY src ./src
+RUN mvn clean package -DskipTests || \
+    mvn clean package -DskipTests -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true
+
+# 运行阶段
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+# 安装必要的工具
+RUN apt-get update && \
+    apt-get install -y netcat-openbsd curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# 复制构建的 JAR 文件
+COPY --from=builder /app/target/*.jar app.jar
+
+# 创建邮件存储目录
+RUN mkdir -p /var/mail/storage
+
+# 暴露端口
+EXPOSE 8080 25 465 143 993 110 995
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:8080/api/actuator/health || exit 1
+
+# 启动应用
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
