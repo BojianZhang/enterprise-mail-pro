@@ -1,0 +1,179 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: enterprise-mail-system
+    
+  profiles:
+    active: dev
+    
+  datasource:
+    url: jdbc:mysql://localhost:3306/mail_system?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        use_sql_comments: true
+        
+  redis:
+    host: localhost
+    port: 6379
+    password: ''
+    database: 0
+    timeout: 10000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1ms
+        
+  mail:
+    host: localhost
+    port: 25
+    username: admin@enterprise.mail
+    password: admin123456
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: "*"
+            
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 30MB
+      
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000
+      cache-null-values: false
+      
+# JWT Configuration
+jwt:
+  secret: ThisIsAVerySecureSecretKeyForJWTTokenGenerationPleaseChangeInProduction2024
+  expiration: 86400000 # 24 hours
+  refresh-expiration: 604800000 # 7 days
+  
+# Mail Server Configuration
+mail-server:
+  smtp:
+    enabled: true
+    port: 25
+    secure-port: 465
+    max-connections: 100
+    auth-required: true
+    tls-enabled: true
+    
+  imap:
+    enabled: true
+    port: 143
+    secure-port: 993
+    max-connections: 50
+    
+  pop3:
+    enabled: true
+    port: 110
+    secure-port: 995
+    max-connections: 30
+    
+  domain:
+    default: enterprise.mail
+    allowed-domains:
+      - enterprise.mail
+      - company.com
+      
+  storage:
+    path: /var/mail/storage
+    max-mailbox-size: 1073741824 # 1GB
+    max-message-size: 26214400 # 25MB
+    
+  security:
+    dkim-enabled: true
+    spf-enabled: true
+    dmarc-enabled: true
+    spam-filter-enabled: true
+    virus-scan-enabled: false
+    
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.enterprise.mail: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    org.hibernate: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/mail-system.log
+    max-size: 10MB
+    max-history: 30
+    
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+        
+# API Documentation
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    
+# CORS Configuration
+cors:
+  allowed-origins:
+    - http://localhost:3000
+    - http://localhost:8081
+  allowed-methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  allowed-headers:
+    - "*"
+  exposed-headers:
+    - Authorization
+    - Content-Type
+  allow-credentials: true
+  max-age: 3600
