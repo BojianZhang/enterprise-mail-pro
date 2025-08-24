@@ -1,0 +1,80 @@
+# 测试环境配置
+spring:
+  profiles:
+    active: test
+    
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+    
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+    
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    
+  redis:
+    host: localhost
+    port: 6379
+    password: 
+    
+logging:
+  level:
+    root: WARN
+    com.enterprise.mail: INFO
+    org.springframework.web: INFO
+    
+# JWT配置（测试环境）
+jwt:
+  secret: test-secret-key-for-jwt-2024
+  expiration: 3600
+  
+# 邮件服务器配置（测试环境 - 使用GreenMail）
+mail:
+  server:
+    enabled: true
+    smtp:
+      host: localhost
+      port: 3025
+    imap:
+      host: localhost
+      port: 3143
+    pop3:
+      host: localhost
+      port: 3110
+      
+# CORS配置（测试环境）
+cors:
+  allowed-origins: "*"
+  
+# 文件上传配置
+spring.servlet.multipart:
+  max-file-size: 5MB
+  max-request-size: 20MB
+  
+# Actuator配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      
+# 测试数据初始化
+test:
+  data:
+    init: true
+    users: 5
+    emails: 20

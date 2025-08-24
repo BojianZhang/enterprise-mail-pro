@@ -64,7 +64,7 @@ spring:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:25}
     username: ${MAIL_USERNAME:admin@enterprise.mail}
-    password: ${MAIL_PASSWORD:changeme}
+    password: ${MAIL_PASSWORD:Admin@Secure2024!}
     properties:
       mail:
         smtp:
@@ -89,12 +89,6 @@ spring:
     time-zone: ${TIMEZONE:GMT+8}
     serialization:
       write-dates-as-timestamps: false
-    
-  cache:
-    type: redis
-    redis:
-      time-to-live: 3600000
-      cache-null-values: false
       
 # JWT Configuration - MUST be changed in production
 jwt:

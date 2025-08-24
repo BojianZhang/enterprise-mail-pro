@@ -22,7 +22,7 @@ service.interceptors.request.use(
     return config
   },
   (error) => {
-    console.error('Request error:', error)
+    // 请求错误处理
     return Promise.reject(error)
   }
 )

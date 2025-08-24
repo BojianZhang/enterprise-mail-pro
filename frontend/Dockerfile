@@ -4,8 +4,9 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # 复制 package.json 并安装依赖
-COPY package*.json ./
-RUN npm ci
+COPY package.json ./
+# 使用 npm install 而不是 npm ci，因为 package-lock.json 可能不同步
+RUN npm install --legacy-peer-deps
 
 # 复制源代码
 COPY . .

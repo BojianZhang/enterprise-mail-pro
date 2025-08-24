@@ -67,7 +67,7 @@ export const useUserStore = defineStore('user', () => {
     try {
       await logout()
     } catch (error) {
-      console.error('Logout error:', error)
+      // 即使logout失败也要清理本地token
     } finally {
       clearToken()
       router.push('/login')
@@ -87,9 +87,15 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  const checkAuth = () => {
+  const checkAuth = async () => {
     if (token.value && !userInfo.value) {
-      // TODO: 获取用户信息
+      try {
+        const { getUserInfo } = await import('@/api/user')
+        const info = await getUserInfo()
+        userInfo.value = info
+      } catch (error) {
+        clearToken()
+      }
     }
   }
 

@@ -32,7 +32,22 @@ public class JwtTokenUtil {
     
     private SecretKey getSigningKey() {
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
+        // 确保密钥至少256位（32字节）
+        if (keyBytes.length < 32) {
+            throw new IllegalArgumentException("JWT secret must be at least 256 bits (32 bytes)");
+        }
+        // 如果密钥正好32字节，直接使用；否则使用SHA-256哈希
+        if (keyBytes.length == 32) {
+            return Keys.hmacShaKeyFor(keyBytes);
+        } else {
+            try {
+                java.security.MessageDigest sha = java.security.MessageDigest.getInstance("SHA-256");
+                byte[] hashedKey = sha.digest(keyBytes);
+                return Keys.hmacShaKeyFor(hashedKey);
+            } catch (java.security.NoSuchAlgorithmException e) {
+                throw new RuntimeException("SHA-256 algorithm not available", e);
+            }
+        }
     }
     
     public String extractUsername(String token) {

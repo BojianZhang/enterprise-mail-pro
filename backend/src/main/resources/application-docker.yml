@@ -1,0 +1,53 @@
+# Docker环境专用配置
+spring:
+  profiles:
+    active: docker
+    
+  datasource:
+    url: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:mail_system}?useSSL=true&requireSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:mailuser}
+    password: ${MYSQL_PASSWORD:}
+    
+  redis:
+    host: redis
+    port: 6379
+    password: ${REDIS_PASSWORD:}
+    ssl: false
+    
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    
+logging:
+  level:
+    root: INFO
+    com.enterprise.mail: INFO
+  file:
+    name: /app/logs/mail-system.log
+    
+server:
+  port: 8080
+  
+# 邮件服务器配置
+mail:
+  server:
+    smtp:
+      host: 0.0.0.0
+      port: 25
+    imap:
+      host: 0.0.0.0
+      port: 143
+    pop3:
+      host: 0.0.0.0
+      port: 110
+      
+# 健康检查配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized

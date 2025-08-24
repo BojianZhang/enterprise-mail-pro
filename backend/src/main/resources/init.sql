@@ -13,9 +13,11 @@ CREATE INDEX idx_email_aliases_user_id ON email_aliases(user_id);
 CREATE INDEX idx_email_aliases_domain_id ON email_aliases(domain_id);
 CREATE INDEX idx_domains_domain_name ON domains(domain_name);
 
--- Insert default admin user (password: admin123456)
+-- Insert default admin user (password: Admin@123)
+-- BCrypt hash for 'Admin@123'
 INSERT INTO users (username, email, password, first_name, last_name, role, status, email_verified, created_at, updated_at, is_deleted, version)
-VALUES ('admin', 'admin@enterprise.mail', '$2a$10$YourHashedPasswordHere', 'System', 'Administrator', 'SUPER_ADMIN', 'ACTIVE', true, NOW(), NOW(), false, 0);
+VALUES ('admin', 'admin@enterprise.mail', '$2a$10$N9qo8uLOickgx2ZMRZoHK.eGaFqtR8fRmFJdRFhPCPzLXL2LMQqDi', 'System', 'Administrator', 'SUPER_ADMIN', 'ACTIVE', true, NOW(), NOW(), false, 0)
+ON DUPLICATE KEY UPDATE updated_at = NOW();
 
 -- Insert default domain
 INSERT INTO domains (domain_name, description, status, is_verified, is_default, created_at, updated_at, is_deleted, version)

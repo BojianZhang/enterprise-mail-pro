@@ -83,3 +83,10 @@ coverage/
 # 仅保留必要的配置示例
 !.env.example
 !nginx.conf.example
+
+# 敏感配置文件
+.env.production
+application-prod.yml
+application-prod.properties
+*.p12
+secrets/

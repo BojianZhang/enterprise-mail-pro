@@ -1,0 +1,106 @@
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: mail-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123456}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mail_system}
+      MYSQL_USER: ${MYSQL_USER:-mailuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mail123456}
+      TZ: ${TZ:-Asia/Shanghai}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mail-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: mail-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mail-network
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis123456}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis123456}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 后端 Spring Boot 应用
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mail-backend
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-mail_system}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-mailuser}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-mail123456}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD:-redis123456}
+      JWT_SECRET: ${JWT_SECRET:-ThisIsAVerySecureSecretKeyForJWTTokenGenerationPleaseChangeInProduction2024}
+      MAIL_HOST: ${MAIL_HOST:-localhost}
+      MAIL_PORT: ${MAIL_PORT:-25}
+      MAIL_USERNAME: ${MAIL_USERNAME:-admin@enterprise.mail}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-changeme}
+    ports:
+      - "8080:8080"
+      - "25:25"     # SMTP
+      - "465:465"   # SMTP SSL
+      - "143:143"   # IMAP
+      - "993:993"   # IMAP SSL
+      - "110:110"   # POP3
+      - "995:995"   # POP3 SSL
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - mail_data:/var/mail/storage
+      - ./logs:/app/logs
+    networks:
+      - mail-network
+
+  # 前端 Vue 应用
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.simple
+    container_name: mail-frontend
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+    networks:
+      - mail-network
+
+networks:
+  mail-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  mail_data:
+    driver: local
